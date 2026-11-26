@@ -418,14 +418,13 @@ def p1abilities():
             slash *= 2
             p1MotivateATK = False
             abilityCharge = False
-        enemyhp -= slash
-        p1hp -= 25
         slashCrit = random.randint(1, 3)
         if slashCrit == 3:
             slash = int(slash * 1.5)
             print(f"Crítico! {p1} usou Slash e deu {slash} de dano! Derrubou o inimigo!")
             print("-------------------------------------------------------------")  
             skipEnemy = True
+            enemyhp-= slash
             wait()
             clear()
             print("-------------------------TURNO EXTRA!------------------------")
@@ -435,6 +434,8 @@ def p1abilities():
             print("-------------------------------------------------------------")
             wait()
             clear()
+        enemyhp -= slash
+        p1hp -= 25
     elif p1ability == 6:
         p1sp -= 6
         p1block = True
