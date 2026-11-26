@@ -81,7 +81,7 @@ enemyhp = 425
 enemyMaxHP = 425
 if enemyhp > enemyMaxHP:
     enemyhp = enemyMaxHP
-turns = 1
+turns = 0
 skipEnemy = False
 p1target = 0
 p2target = 0
@@ -526,6 +526,8 @@ def p1cards():
         clear()
         p1atkBonus += 3
         p1sp += 5
+        if p1sp > 30:
+            p1sp = 30
     elif p1upgrade == 2:
         print("Aumentou defesa por 2. Restaurou 5 SP.")
         print("------------------------------------")
@@ -533,6 +535,8 @@ def p1cards():
         clear()
         p1defBonus += 2
         p1sp += 5
+        if p1sp > 30:
+            p1sp = 30
     elif p1upgrade == 3:
         print("Aumentou seu HP máximo por 10. Restaurou 5 SP.")
         print("------------------------------------")
@@ -540,6 +544,8 @@ def p1cards():
         clear()
         p1maxHP += 10
         p1sp += 5
+        if p1sp > 30:
+            p1sp = 30
     elif p1upgrade == 4:
         print("Recebeu a habilidade Life Steal.")
         wait()
@@ -1044,13 +1050,13 @@ clear()
 
 while (p1hp > 0 or p2hp > 0) and enemyhp > 0:
     if p1hp > 0:
-        if turns % 3 == 0:
+        if turns != 0 and turns % 3 == 0:
             p1cards()
         p1menu()
     if enemyhp <= 0:
         break
     if p2hp > 0:
-        if turns % 3 == 0:
+        if turns != 0 and turns % 3 == 0:
             p2cards()
         p2menu()
     if enemyhp <= 0:
