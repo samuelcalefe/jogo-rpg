@@ -41,6 +41,7 @@ charge = False
 lifeSteal = False
 ult = False
 abilityCharge = False
+invAccess = False
 
 # estatisticas do jogador 2
 p2hp = 80
@@ -210,10 +211,10 @@ def pray():
         print("SP insuficiente.")
         wait()
         clear()
-        p2menu()
-    print(f"[1] {p1} ({p1hp}HP)")
-    print(f"[2] {p2} ({p2hp}HP)")
-    print("[3] Voltar")
+    else:
+        print(f"[1] {p1} ({p1hp}HP)")
+        print(f"[2] {p2} ({p2hp}HP)")
+        print("[3] Voltar")
     try:
         healChoice = int(input("Quem curar? [1/2]: "))
     except ValueError:
@@ -224,11 +225,17 @@ def pray():
         except ValueError:
             healChoice = 0
     if healChoice == 1:
+        if p1hp <= 0:
+            print(f"{p1} está morto! Não foi curado.")
+            wait()
+            clear()
+            healChoice == 3
         print(f"Curou {p1} com {heal + p2magBonus}HP!")
         wait()
         clear()
         p2sp -= 10
         p1hp += (heal + p2magBonus)
+        
     elif healChoice == 2:
         print(f"Curou {p2} com {heal + p2magBonus}HP!")
         wait()
@@ -296,7 +303,7 @@ def isCharged():
 
 # ações                               
 def p1menu():
-    global p1hp, p1sp, p1atk, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1MotivateATK, p1maxHP, abilityCharge, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns
+    global p1hp, p1sp, p1atk, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1MotivateATK, p1maxHP, abilityCharge, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p1MotivateDEF, p2MotivateATK, p2MotivateDEF
     if p1hp <= 0:
         return
     if p1hp > p1maxHP:
@@ -320,11 +327,13 @@ def p1menu():
     print("[1] Atacar - Dano básico com baixa chance de crítico")
     print("[2] Habilidades - Menu de habilidades")
     print("[3] Defender - Restora SP e reduz dano tomado")
+    actOption = [1, 2, 3]
+    if invAccess == True:
+        actOption.append(4)
+        print("[4] Itens - Utiliza um item da mochila")
     if skipEnemy == True:
-        actOption = [1, 2, 3, 4]
-        print(f"[4] Trocar - Passa seu turno extra para {p2}")
-    else:
-        actOption = [1, 2, 3]
+        actOption.append(5)
+        print(f"[5] Trocar - Passa seu turno extra para {p2}")
     try:
         p1action = int(input("O que fazer: "))
     except ValueError:
@@ -373,6 +382,101 @@ def p1menu():
         wait()
         clear()
     elif p1action == 4:
+        clear()
+        print(f"------------------------{p1} - Itens--------------------------")
+        print("[1] Poção de vida      | [6] Poção de energia")
+        print("[2] Poção de vida      | [7] Poção de energia")
+        print("[3] Poção de motivação | [8] Poção de motivação")
+        print("[4] Menta da vida      | [9] Menta da vida")
+        print("[5] Refrescador        | [10] Proteína pura")
+        print("[0] Voltar")
+        inventory = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        try:
+            item = int(input("Escolha um item: "))
+        except ValueError:
+            item = 0
+        while item not in inventory:
+            item = int(input("Escolha um item válido: "))
+        if item == 0:
+            clear()
+            p1menu()
+        elif item == 1 or item == 2:
+            print("Poção de vida - Cura 20 de HP")
+            print(f"[1] {p1}")
+            print(f"[2] {p2}")
+            print("[0] Voltar")
+            try:
+                playerItem = int(input("Em quem usar: "))
+            except ValueError:
+                playerItem = 0
+            while playerItem not in [1, 2]:
+                playerItem = int(input("Escolha um jogador: "))
+            if playerItem == 1:
+                p1hp += 20
+                print(f"{p1} consumiu a Poção de vida!")
+                wait()
+                clear()
+                if item == 1:
+                    inventory.remove(1)
+                elif item == 2:
+                    inventory.remove(2)
+            elif playerItem == 2:
+                if p2hp <= 0:
+                    print(f"{p2} está morto! Não foi curado.")
+                    wait()
+                    clear()
+                    playerItem = 0
+                p2hp += 20
+                print(f"{p2} consumiu a Poção de vida!")
+                wait()
+                clear()
+                if item == 1:
+                    inventory.remove(1)
+                elif item == 2:
+                    inventory.remove(2)
+        elif item == 3 or item == 8:
+            print("Poção de motivação - Motiva um jogador")
+            print(f"[1] {p1}")
+            print(f"[2] {p2}")
+            print("[0] Voltar")
+            try:
+                playerItem = int(input("Em quem usar: "))
+            except ValueError:
+                playerItem = 0
+            while playerItem not in [1, 2]:
+                playerItem = int(input("Escolha um jogador: "))
+            if playerItem == 1:
+                p1MotivateATK = True
+                p1MotivateDEF = True
+                print(f"{p1} consumiu a Poção de motivação!")
+                wait()
+                clear()
+                if item == 3:
+                    inventory.remove(3)
+                elif item == 8:
+                    inventory.remove(8)
+            elif playerItem == 2:
+                if p2hp <= 0:
+                    print(f"{p2} está morto! Não foi motivado.")
+                    wait()
+                    clear()
+                    playerItem = 0
+                else:
+                    p2hp += 20
+                    print(f"{p2} consumiu a Poção de vida!")
+                    wait()
+                    clear()
+                    p2MotivateATK = True
+                    p2MotivateDEF = True
+                    print(f"{p2} consumiu a Poção de motivação!")
+                    wait()
+                    clear()
+                    if item == 3:
+                        inventory.remove(3)
+                    elif item == 8:
+                        inventory.remove(8)
+            
+    elif p1action == 5:
         print(f"Passou para {p2}!")
         time.sleep(2)
         clear()
@@ -510,6 +614,10 @@ def p1cards():
     if turns >= 12 and ult == False:
         print("[6] ULT    |  Desbloqueia seu potencial.")
         options.append(6)
+    invDrop = random.randint(1, 5)
+    if invDrop == 5 and invAccess == False:
+        print("[7] INV    |  Drop raro! Recebe uma mochila de itens.")
+        options.append(7)
     try:
         p1upgrade = int(input("Escolha seu upgrade: "))
     except ValueError:
@@ -561,6 +669,11 @@ def p1cards():
         wait()
         clear()
         ult = True
+    elif p1upgrade == 7:
+        print("Recebeu a mochila de itens.")
+        wait()
+        clear()
+        invAccess = True
 
 def p2menu():
     global p1hp, p1sp, p1atk, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns
@@ -725,9 +838,9 @@ def p2cards():
     while p2upgrade not in p2options:
         p2upgrade = int(input("Escolha um válido: "))
     if p2upgrade == 1:
-        p2magBonus += 4
+        p2magBonus += 2
         p2sp += 5
-        print("Melhorou habilidades de magia por +4! Recebeu 5 SP.")
+        print("Melhorou habilidades de magia por +2! Recebeu 5 SP.")
         print("-------------------------------------------------------------")
         wait()
         clear()
