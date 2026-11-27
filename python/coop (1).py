@@ -299,7 +299,7 @@ def motivate():
         mot = int(input("Escolha 1 ou 2: "))
     if mot == 1:
         p1MotivateATK = True
-        p2MotivateDEF = True
+        p1MotivateDEF = True
         print(f"{p1} foi motivado! ATK+ e DEF+")
         wait()
         clear()
@@ -386,7 +386,7 @@ def p1menu():
             if defDebuffTurns >= 3:
                 defDebuff = False
                 defDebuffTurns = 0
-        if isCharged:
+        if abilityCharge:
             crit = random.randint(3, 6)
         else:
             crit = random.randint(1, 6)
@@ -677,7 +677,7 @@ def p1menu():
         p2menu()
 
 def p1abilities():
-    global p1hp, p1sp, p1atk, p1maxHP, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1block, p1MotivateATK, abilityCharge, p1Ult, defDebuff, defDebuffTurns
+    global p1hp, p1sp, p1atk, p1maxHP, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1block, p1MotivateATK, abilityCharge, p1Ult, defDebuff, defDebuffTurns, speed, speedTurns
     p1stats()
     print(f"------------------------{p1} - Habilidades--------------------------")
     print("[5] Slash - Dano físico com média chance de crítico (25 HP)")
@@ -687,13 +687,13 @@ def p1abilities():
     abilityChoice = [5, 6, 7, 8, 0]
     if lifeSteal == True:
         print("[9] Life Steal - Rouba 25 HP do inimigo para si mesmo. (10 SP)")
-        abilityChoice.append(8)
+        abilityChoice.append(9)
     if charge == True:
         print("[10] Charge - Aumenta o ataque e a chance de crítico pro próximo ataque (12 SP)")
-        abilityChoice.append(9)
+        abilityChoice.append(10)
     if ult == True:
         print(f"[11] Ult - 75 de dano ao inimigo, pula o próximo turno dele e recupera 15 HP para todos os aliados. (20 SP) ({p1Ult}%)")
-        abilityChoice.append(10)
+        abilityChoice.append(11)
         
     print("[0] Voltar")
     try:
@@ -717,7 +717,7 @@ def p1abilities():
             slash *= 2
             p1MotivateATK = False
             abilityCharge = False
-        if isCharged:
+        if abilityCharge:
             slashCrit = random.randint(2, 3)
         else:
             slashCrit = random.randint(1, 3)
@@ -783,19 +783,13 @@ def p1abilities():
             clear()
     elif p1ability == 8:
         speed = True
+        speedTurns = 0
         print("Aumentou os reflexos dos jogadores por 3 turnos!")
         p1sp -= 9
         if p1sp < 0:
             p1sp = 0
         wait()
         clear()
-        while speedTurns % 3 != 0:
-            speedTurns += 1
-        if speedTurns != 0 and speedTurns % 3 == 0:
-            speed = False
-            speedTurns = 0
-            print("A adrenalina passou...")
-            print("-------------------------------------------------------------")
     elif p1ability == 9:
         print("Roubou 25 HP do inimigo!")
         enemyhp -= 25
@@ -919,7 +913,7 @@ def p1cards():
         invAccess = True
 
 def p2menu():
-    global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns
+    global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p2Defend
     if p2hp <= 0:
         return
     if rabbitActive:
@@ -1005,10 +999,10 @@ def p2magic():
     magicOptions = [5, 6, 7, 8, 0]
     if p2Parry == True:
         print("[9] Parry - Prepara uma barreira protetora que reflete um ataque (18 SP)")
-        magicOptions.append(8)
+        magicOptions.append(9)
     if p2Ult == True:
         print(f"[10] Ult - 50 de dano ao inimigo, diminui o ataque e defesa dele, e restaura SP por completo. (40 HP) ({p2ultCharge}%)")
-        magicOptions.append(9)
+        magicOptions.append(10)
     try:
         p2action = int(input("O que fazer: "))
     except ValueError:
@@ -1145,7 +1139,7 @@ def p2cards():
 
 def enemyActions():
     global p1hp, p1sp, p2hp, p2sp, enemyhp, enemyMaxHP, p1target, p2target, skipEnemy, skipP1, skipP2, playerChoice, p1block, wolfActive, wolfTurns, parryActive, atkDebuff, atkDebuffTurns
-    global p1MotivateDEF, p2MotivateDEF, ragedEnemy, speed
+    global p1MotivateDEF, p2MotivateDEF, ragedEnemy, speed, speedTurns
     if p1hp <= 0 and p2hp <= 0:
         return
     if skipEnemy:
@@ -1185,7 +1179,7 @@ def enemyActions():
             if ragedEnemy == True:
                 enemyatk = random.randint(10, 35) + p1target
                 enemyCrit = random.randint(1, 4)
-                if speed:
+                if speed and random.randint(1, 4) == 1:
                     enemyatk = 0
                     enemyCrit = 0
                     print(f"O inimigo atacou {p1} mas ele(a) desviou!")
@@ -1214,7 +1208,7 @@ def enemyActions():
                         clear()
             else:
                 enemyatk = random.randint(7, 28) + p1target
-                if speed:
+                if speed and random.randint(1, 4) == 1:
                     enemyatk = 0
                     print(f"O inimigo atacou {p1} mas ele(a) desviou!")
                     print("-------------------------------------------------------------")
@@ -1247,7 +1241,7 @@ def enemyActions():
             if ragedEnemy == True:
                 enemyatk = random.randint(10, 35) + p2target
                 enemyCrit = random.randint(1, 4)
-                if speed:
+                if speed and random.randint(1, 4) == 1:
                     enemyatk = 0
                     enemyCrit = 0
                     print(f"O inimigo atacou {p2} mas ele(a) desviou!")
@@ -1276,7 +1270,7 @@ def enemyActions():
                         clear()
             else:
                 enemyatk = random.randint(7, 28) + p2target
-                if speed:
+                if speed and random.randint(1, 4) == 1:
                     enemyatk = 0
                     enemyCrit = 0
                     print(f"O inimigo atacou {p2} mas ele(a) desviou!")
@@ -1290,40 +1284,40 @@ def enemyActions():
                         if atkDebuffTurns >= 3:
                             atkDebuff = False
                             atkDebuffTurns = 0
-            if parryActive:
-                enemyhp -= enemyatk
-                if enemyhp < 0:
-                    enemyhp = 0
-                print(f"{p2} deu um parry no ataque do inimigo! -{enemyatk} HP")
-                print("-------------------------------------------------------------")
-                parryActive = False
-                wait()
-                clear()
-            else:
-                if p1block:
-                    p1absorb = enemyatk // 2
-                    enemyatk -= p1absorb
-                    p1hp -= p1absorb
-                    if p1hp < 0:
-                        p1hp = 0
-                    print(f"{p1} bloqueou e absorveu {p1absorb} do dano!")
-                    p1block = False
-                if p2MotivateDEF == True:
-                    enemyatk //= 2
-                    p2hp -= enemyatk
-                    if p2hp < 0:
-                        p2hp = 0
-                    print(f"O inimigo atacou {p2} e deu {enemyatk} de dano!")
-                    p2MotivateDEF = False
-                    wait()
-                    clear()
-                else:
-                    p2hp -= enemyatk
-                    if p2hp < 0:
-                        p2hp = 0
-                    print(f"O inimigo atacou {p2} e deu {enemyatk} de dano!")
-                    wait()
-                    clear()
+                    if parryActive:
+                        enemyhp -= enemyatk
+                        if enemyhp < 0:
+                            enemyhp = 0
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyatk} HP")
+                        print("-------------------------------------------------------------")
+                        parryActive = False
+                        wait()
+                        clear()
+                    else:
+                        if p1block:
+                            p1absorb = enemyatk // 2
+                            enemyatk -= p1absorb
+                            p1hp -= p1absorb
+                            if p1hp < 0:
+                                p1hp = 0
+                            print(f"{p1} bloqueou e absorveu {p1absorb} do dano!")
+                            p1block = False
+                        if p2MotivateDEF == True:
+                            enemyatk //= 2
+                            p2hp -= enemyatk
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo atacou {p2} e deu {enemyatk} de dano!")
+                            p2MotivateDEF = False
+                            wait()
+                            clear()
+                        else:
+                            p2hp -= enemyatk
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo atacou {p2} e deu {enemyatk} de dano!")
+                            wait()
+                            clear()
     elif enemyChoice == 2:
         enemySpell = random.randint(1, 4)
         if enemySpell == 1:
@@ -1332,182 +1326,184 @@ def enemyActions():
                     enemyFire = random.randint(12, 40) + p1target
                 else:
                     enemyFire = random.randint(10, 36) + p1target
-                if speed:
-                    enemyatk = 0
-                    enemyCrit = 0
+                if speed and random.randint(1, 4) == 1:
+                    enemyFire = 0
                     print(f"O inimigo atacou {p1} mas ele(a) desviou!")
                     print("-------------------------------------------------------------")
                     wait()
                     clear()
-                if atkDebuff:
-                    enemyFire -= 7
-                    atkDebuffTurns += 1
-                    if atkDebuffTurns >= 3:
-                        atkDebuff = False
-                        atkDebuffTurns = 0
-                if p1MotivateDEF == True:
-                    enemyFire //= 2
-                    p1hp -= enemyFire
-                    if p1hp < 0:
-                        p1hp = 0
-                    print(f"O inimigo usou fogo contra {p1}! Tomou {enemyFire} de dano.")
-                    p1MotivateDEF = False
                 else:
-                    p1hp -= enemyFire
-                    if p1hp < 0:
-                        p1hp = 0
-                    print(f"O inimigo usou fogo contra {p1}! Tomou {enemyFire} de dano.")
+                    if atkDebuff:
+                        enemyFire -= 7
+                        atkDebuffTurns += 1
+                        if atkDebuffTurns >= 3:
+                            atkDebuff = False
+                            atkDebuffTurns = 0
+                    if p1MotivateDEF == True:
+                        enemyFire //= 2
+                        p1hp -= enemyFire
+                        if p1hp < 0:
+                            p1hp = 0
+                        print(f"O inimigo usou fogo contra {p1}! Tomou {enemyFire} de dano.")
+                        p1MotivateDEF = False
+                    else:
+                        p1hp -= enemyFire
+                        if p1hp < 0:
+                            p1hp = 0
+                        print(f"O inimigo usou fogo contra {p1}! Tomou {enemyFire} de dano.")
+                    enemyBurn = random.randint(1, 4)
+                    if enemyBurn == 4:
+                        p1Burn()
+                        wait()
+                        clear()
+                    else:
+                        wait()
+                        clear()
             elif playerTarget == 2:
                 if ragedEnemy:
                     enemyFire = random.randint(12, 40) + p2target
                 else:
                     enemyFire = random.randint(10, 36) + p2target
-                if speed:
-                    enemyatk = 0
-                    enemyCrit = 0
+                if speed and random.randint(1, 4) == 1:
+                    enemyFire = 0
                     print(f"O inimigo atacou {p2} mas ele(a) desviou!")
                     print("-------------------------------------------------------------")
                     wait()
                     clear()
-                if atkDebuff:
-                    enemyFire -= 7
-                    atkDebuffTurns += 1
-                    if atkDebuffTurns >= 3:
-                        atkDebuff = False
-                        atkDebuffTurns = 0
-                if parryActive:
-                    enemyhp -= enemyFire
-                    if enemyhp < 0:
-                        enemyhp = 0
-                    print(f"{p2} deu um parry no ataque do inimigo! -{enemyFire} HP")
-                    print("-------------------------------------------------------------")
-                    parryActive = False
-                    wait()
-                    clear()
                 else:
-                    if p2MotivateDEF == True:
-                        enemyFire //= 2
-                        p2hp -= enemyFire
-                        if p2hp < 0:
-                            p2hp = 0
-                        print(f"O inimigo usou fogo contra {p2}! Tomou {enemyFire} de dano.")
-                        p2MotivateDEF = False
-                    else:
-                        p2hp -= enemyFire
-                        if p2hp < 0:
-                            p2hp = 0
-                        print(f"O inimigo usou fogo contra {p2}! Tomou {enemyFire} de dano.")
-                    enemyBurn = random.randint(1, 4)
-                    if enemyBurn == 4:
-                        p2Burn()
+                    if atkDebuff:
+                        enemyFire -= 7
+                        atkDebuffTurns += 1
+                        if atkDebuffTurns >= 3:
+                            atkDebuff = False
+                            atkDebuffTurns = 0
+                    if parryActive:
+                        enemyhp -= enemyFire
+                        if enemyhp < 0:
+                            enemyhp = 0
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyFire} HP")
+                        print("-------------------------------------------------------------")
+                        parryActive = False
                         wait()
                         clear()
                     else:
-                        wait()
-                        clear()
+                        if p2MotivateDEF == True:
+                            enemyFire //= 2
+                            p2hp -= enemyFire
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo usou fogo contra {p2}! Tomou {enemyFire} de dano.")
+                            p2MotivateDEF = False
+                        else:
+                            p2hp -= enemyFire
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo usou fogo contra {p2}! Tomou {enemyFire} de dano.")
+                        enemyBurn = random.randint(1, 4)
+                        if enemyBurn == 4:
+                            p2Burn()
+                            wait()
+                            clear()
+                        else:
+                            wait()
+                            clear()
         elif enemySpell == 2:
             if playerTarget == 1:
                 if ragedEnemy:
                     enemyIce = random.randint(10, 35)
                 else:
                     enemyIce = random.randint(8, 30) + p1target
-                if speed:
-                    enemyatk = 0
-                    enemyCrit = 0
+                if speed and random.randint(1, 4) == 1:
+                    enemyIce = 0
                     print(f"O inimigo atacou {p1} mas ele(a) desviou!")
                     print("-------------------------------------------------------------")
                     wait()
                     clear()
-                if atkDebuff:
-                    enemyIce -= 7
-                    atkDebuffTurns += 1
-                    if atkDebuffTurns >= 3:
-                        atkDebuff = False
-                        atkDebuffTurns = 0
-                if p1MotivateDEF == True:
-                    enemyIce //= 2
-                    p1hp -= enemyIce
-                    if p1hp < 0:
-                        p1hp = 0
-                    print(f"O inimigo usou gelo contra {p1}! Tomou {enemyIce} de dano.")
-                    p1MotivateDEF = False
                 else:
-                    p1hp -= enemyIce
-                    if p1hp < 0:
-                        p1hp = 0
-                    print(f"O inimigo usou gelo contra {p1}! Tomou {enemyIce} de dano.")
-                if ragedEnemy:
-                    enemyFreeze = random.randint(1, 2)
-                else:
-                    enemyFreeze = random.randint(1, 3)
-                if enemyFreeze == 3:
-                    skipP1 = True
-                    time.sleep(2)
-                    print(f"Congelou! {p1} não pode se mexer!")
-                    wait()
-                    clear()
-                else:
-                    wait()
-                    clear()
+                    if atkDebuff:
+                        enemyIce -= 7
+                        atkDebuffTurns += 1
+                        if atkDebuffTurns >= 3:
+                            atkDebuff = False
+                            atkDebuffTurns = 0
+                    if p1MotivateDEF == True:
+                        enemyIce //= 2
+                        p1hp -= enemyIce
+                        if p1hp < 0:
+                            p1hp = 0
+                        print(f"O inimigo usou gelo contra {p1}! Tomou {enemyIce} de dano.")
+                        p1MotivateDEF = False
+                    else:
+                        p1hp -= enemyIce
+                        if p1hp < 0:
+                            p1hp = 0
+                        print(f"O inimigo usou gelo contra {p1}! Tomou {enemyIce} de dano.")
+                    if ragedEnemy:
+                        enemyFreeze = random.randint(1, 2)
+                    else:
+                        enemyFreeze = random.randint(1, 3)
+                    if enemyFreeze == 3:
+                        skipP1 = True
+                        time.sleep(2)
+                        print(f"Congelou! {p1} não pode se mexer!")
+                        wait()
+                        clear()
+                    else:
+                        wait()
+                        clear()
             elif playerTarget == 2:
                 if ragedEnemy:
                     enemyIce = random.randint(10, 35) + p2target
-                enemyIce = random.randint(8, 30) + p2target
-                if speed:
-                    enemyatk = 0
-                    enemyCrit = 0
+                else:
+                    enemyIce = random.randint(8, 30) + p2target
+                if speed and random.randint(1, 4) == 1:
+                    enemyIce = 0
                     print(f"O inimigo atacou {p2} mas ele(a) desviou!")
                     print("-------------------------------------------------------------")
                     wait()
                     clear()
-                if atkDebuff:
-                    enemyIce -= 7
-                    atkDebuffTurns += 1
-                    if atkDebuffTurns >= 3:
-                        atkDebuff = False
-                        atkDebuffTurns = 0
-                if parryActive:
-                    enemyhp -= enemyIce
-                    if enemyhp < 0:
-                        enemyhp = 0
-                    print(f"{p2} deu um parry no ataque do inimigo! -{enemyIce} HP")
-                    print("-------------------------------------------------------------")
-                    parryActive = False
-                    wait()
-                    clear()
                 else:
-                    if p2MotivateDEF:
-                        enemyIce //= 2
-                        p2hp -= enemyIce
-                        if p2hp < 0:
-                            p2hp = 0
-                        print(f"O inimigo usou gelo contra {p2}! Tomou {enemyIce} de dano.")
-                        p2MotivateDEF = False
+                    if atkDebuff:
+                        enemyIce -= 7
+                        atkDebuffTurns += 1
+                        if atkDebuffTurns >= 3:
+                            atkDebuff = False
+                            atkDebuffTurns = 0
+                    if parryActive:
+                        enemyhp -= enemyIce
+                        if enemyhp < 0:
+                            enemyhp = 0
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyIce} HP")
+                        print("-------------------------------------------------------------")
+                        parryActive = False
+                        wait()
+                        clear()
                     else:
-                        p2hp -= enemyIce
-                        if p2hp < 0:
-                            p2hp = 0
-                        print(f"O inimigo usou gelo contra {p2}! Tomou {enemyIce} de dano.")
-                if ragedEnemy:
-                    enemyFreeze = random.randint(1, 2)
-                else:
-                    enemyFreeze = random.randint(1, 3)
-                if speed:
-                    enemyatk = 0
-                    enemyFreeze = 0
-                    print(f"O inimigo atacou {p2} mas ele(a) desviou!")
-                    print("-------------------------------------------------------------")
-                    wait()
-                    clear()
-                if enemyFreeze == 3:
-                    skipP2 = True
-                    time.sleep(2)
-                    print(f"Congelou! {p2} não pode se mexer!")
-                    wait()
-                    clear()
-                else:
-                    wait()
-                    clear()
+                        if p2MotivateDEF:
+                            enemyIce //= 2
+                            p2hp -= enemyIce
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo usou gelo contra {p2}! Tomou {enemyIce} de dano.")
+                            p2MotivateDEF = False
+                        else:
+                            p2hp -= enemyIce
+                            if p2hp < 0:
+                                p2hp = 0
+                            print(f"O inimigo usou gelo contra {p2}! Tomou {enemyIce} de dano.")
+                    if ragedEnemy:
+                        enemyFreeze = random.randint(1, 2)
+                    else:
+                        enemyFreeze = random.randint(1, 3)
+                    if enemyFreeze == 3:
+                        skipP2 = True
+                        time.sleep(2)
+                        print(f"Congelou! {p2} não pode se mexer!")
+                        wait()
+                        clear()
+                    else:
+                        wait()
+                        clear()
         elif enemySpell == 3:
             if ragedEnemy == True:
                 enemyhp += 50
@@ -1525,17 +1521,34 @@ def enemyActions():
                 clear()
         elif enemySpell == 4:
             if ragedEnemy == True:
-                p1hp -= 35
-                if p1hp < 0:
-                    p1hp = 0
-                p2hp -= 35
-                if p2hp < 0:
-                    p2hp = 0
-                print(f"O inimigo atacou loucamente! {p1} e {p2} ambos foram atingidos por 35 HP.")
+                if speed and random.randint(1, 4) == 1:
+                    print(f"O inimigo atacou loucamente! Mas {p1} desviou!")
+                else:
+                    p1hp -= 35
+                    if p1hp < 0:
+                        p1hp = 0
+                    print(f"O inimigo atacou loucamente! {p1} foi atingido por 35 HP.")
+                if speed and random.randint(1, 4) == 1:
+                    print(f"O inimigo atacou loucamente! Mas {p2} desviou!")
+                else:
+                    p2hp -= 35
+                    if p2hp < 0:
+                        p2hp = 0
+                    print(f"O inimigo atacou loucamente! {p2} foi atingido por 35 HP.")
                 wait()
                 clear()
             else:
                 enemyActions()
+
+    if speed:
+        speedTurns += 1
+        if speedTurns >= 3:
+            speed = False
+            speedTurns = 0
+            print("A adrenalina passou...")
+            print("-------------------------------------------------------------")
+            wait()
+            clear()
 
 # o jogo
 clear()
