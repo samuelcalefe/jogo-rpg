@@ -206,17 +206,19 @@ def burn():
 def distress():
     global p1target, p2target, enemyDistress, distressTurns
     distressTurns += 1
-    while distressTurns % 3 != 0 and distressTurns != 0:
+    if distressTurns % 3 != 0 and distressTurns != 0:
         enemyDistress = True
         print("O inimigo está distressado! -ATK")
-        wait()
-        clear()
         print("-------------------------------------------------------------")
         p1target //= 2
         p2target //= 2
+        wait()
+        clear()
     else:
         enemyDistress = False
         print("O distresse passou...")
+        wait()
+        clear()
 
 def pray():
     global p1, p1hp, p1maxHP, p2, p2hp, p2sp, heal
@@ -924,16 +926,16 @@ def p2menu():
     global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p2Defend
     if p2hp <= 0:
         return
-    if rabbitActive:
-        if rabbitTurn < 3 and p2hp > 0:
+    if rabbitActive and p2hp > 0:
+        if rabbitTurn < 3:
             print(f"O coelho curou {p2} com 10 HP!")
             p2hp += 10
             if p2hp > 80:
                 p2hp = 80
-    if rabbitTurn == 3:
-        rabbitActive = False
-        rabbitTurn = 0
-        print("O coelho dissipou...")
+        if rabbitTurn == 3:
+            rabbitActive = False
+            rabbitTurn = 0
+            print("O coelho dissipou...")
     p2stats()
     if skipP2:
         print(f"{p2} não pode se mexer!")
@@ -996,7 +998,7 @@ def p2menu():
         p2Casts()
 
 def p2magic():
-    global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, heal, skipP1, skipP2, p1, p2, p2MotivateATK, p2Parry, p2Ult, parryActive, p2ultCharge, defDebuff, defDebuffTurns, atkDebuff
+    global p1hp, p1sp, p1atk, p1maxHP, p2hp, p2sp, p2MaxSP, enemyhp, heal, skipP1, skipP2, p1, p2, p2MotivateATK, p2Parry, p2Ult, parryActive, p2ultCharge, defDebuff, defDebuffTurns, atkDebuff
     p2stats()
     print(f"------------------------{p2} - Magia--------------------------")
     print("[5] Ice - Ataque de gelo com média chance de Freeze (9 SP)")
@@ -1006,7 +1008,7 @@ def p2magic():
     print("[0] Voltar")
     magicOptions = [5, 6, 7, 8, 0]
     if p2Parry == True:
-        print("[9] Parry - Prepara uma barreira protetora que reflete um ataque (18 SP)")
+        print("[9] Parry - Prepara uma postura por 1 turno que reflete o ataque e derruba o inimigo (18 SP)")
         magicOptions.append(9)
     if p2Ult == True:
         print(f"[10] Ult - 50 de dano ao inimigo, diminui o ataque e defesa dele, e restaura SP por completo. (40 HP) ({p2ultCharge}%)")
@@ -1048,19 +1050,19 @@ def p2magic():
     elif p2action == 8:
         songOption = [1, 0]
         print(f"[1] Curar todos")
-        if p1hp < 0:
+        if p1hp <= 0:
             print(f"[2] Reviver {p1}")
             songOption.append(2)
         print("[0] Voltar")
         try:
             songChoice = int(input("Qual música: "))
         except ValueError:
-            songChoice == 0
+            songChoice = 0
         while songChoice not in songOption:
             try:
                 songChoice = int(input("Escolha uma válida:"))
             except ValueError:
-                songChoice == 0
+                songChoice = 0
         if songChoice == 0:
             clear()
             p2magic()
@@ -1073,8 +1075,14 @@ def p2magic():
             print("-------------------------------------------------------------")
             wait()
             clear()
-            p1hp += (16 + p2magBonus)
-            p1hp += (16 + p2magBonus)
+            if p1hp > 0:
+                p1hp += (16 + p2magBonus)
+                if p1hp > p1maxHP:
+                    p1hp = p1maxHP
+            if p2hp > 0:
+                p2hp += (16 + p2magBonus)
+                if p2hp > 80:
+                    p2hp = 80
         elif songChoice == 2:
             p2sp -= 20
             if p2sp < 0:
@@ -1083,11 +1091,11 @@ def p2magic():
             print("-------------------------------------------------------------")
             wait()
             clear()
-            p1hp += (p1maxHP / 2)
+            p1hp = int(p1maxHP / 2)
             
     elif p2action == 9:
         parryActive = True
-        print("Levantou uma barreira protetora!")
+        print("Entrou em postura de parry por 1 turno!")
         print("-------------------------------------------------------------")
         p2sp -= 18
         if p2sp < 0:
@@ -1113,6 +1121,8 @@ def p2magic():
             enemyhp -= 50
             if enemyhp < 0:
                 enemyhp = 0
+            wait()
+            clear()
     elif p2action == 0:
         clear()
         p2menu()
@@ -1246,6 +1256,7 @@ def enemyActions():
                         wait()
                         clear()
                         enemyActions()
+                        return
                     else:
                         p1hp -= enemyatk
                         if p1hp < 0:
@@ -1296,6 +1307,18 @@ def enemyActions():
                     print("-------------------------------------------------------------")
                     wait()
                     clear()
+                elif parryActive:
+                    if enemyCrit == 4:
+                        enemyatk = int(enemyatk * 1.5)
+                    enemyhp -= enemyatk
+                    if enemyhp < 0:
+                        enemyhp = 0
+                    skipEnemy = True
+                    print(f"{p2} deu um parry no ataque do inimigo! -{enemyatk} HP e derrubou o inimigo!")
+                    print("-------------------------------------------------------------")
+                    parryActive = False
+                    wait()
+                    clear()
                 else:
                     if enemyCrit == 4:
                         enemyatk = int(enemyatk * 1.5)
@@ -1308,6 +1331,7 @@ def enemyActions():
                         wait()
                         clear()
                         enemyActions()
+                        return
                     else:
                         p2hp -= enemyatk
                         if p2hp < 0:
@@ -1336,7 +1360,8 @@ def enemyActions():
                         enemyhp -= enemyatk
                         if enemyhp < 0:
                             enemyhp = 0
-                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyatk} HP")
+                        skipEnemy = True
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyatk} HP e derrubou o inimigo!")
                         print("-------------------------------------------------------------")
                         parryActive = False
                         wait()
@@ -1429,7 +1454,8 @@ def enemyActions():
                         enemyhp -= enemyFire
                         if enemyhp < 0:
                             enemyhp = 0
-                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyFire} HP")
+                        skipEnemy = True
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyFire} HP e derrubou o inimigo!")
                         print("-------------------------------------------------------------")
                         parryActive = False
                         wait()
@@ -1521,7 +1547,8 @@ def enemyActions():
                         enemyhp -= enemyIce
                         if enemyhp < 0:
                             enemyhp = 0
-                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyIce} HP")
+                        skipEnemy = True
+                        print(f"{p2} deu um parry no ataque do inimigo! -{enemyIce} HP e derrubou o inimigo!")
                         print("-------------------------------------------------------------")
                         parryActive = False
                         wait()
@@ -1578,6 +1605,13 @@ def enemyActions():
                     print(f"O inimigo atacou loucamente! {p1} foi atingido por 35 HP.")
                 if speed and random.randint(1, 4) == 1:
                     print(f"O inimigo atacou loucamente! Mas {p2} desviou!")
+                elif parryActive:
+                    enemyhp -= 35
+                    if enemyhp < 0:
+                        enemyhp = 0
+                    skipEnemy = True
+                    parryActive = False
+                    print(f"{p2} deu um parry no ataque louco do inimigo! -35 HP e derrubou o inimigo!")
                 else:
                     p2hp -= 35
                     if p2hp < 0:
@@ -1587,6 +1621,14 @@ def enemyActions():
                 clear()
             else:
                 enemyActions()
+                return
+
+    if parryActive:
+        parryActive = False
+        print(f"A postura de parry de {p2} acabou...")
+        print("-------------------------------------------------------------")
+        wait()
+        clear()
 
     if speed:
         speedTurns += 1
