@@ -271,6 +271,10 @@ def pray():
             if p2hp > 80:
                 p2hp = 80
 
+    elif healChoice == 3:
+        clear()
+        p2magic()
+
 def block():
     global p1hp, p1sp, p2, p2hp, p2target, p1block
     if p1block:
@@ -1059,7 +1063,7 @@ def p2magic():
                 songChoice == 0
         if songChoice == 0:
             clear()
-            p2Magic()
+            p2magic()
         elif songChoice == 1:
             media = 16
             p2sp -= 20
@@ -1154,7 +1158,7 @@ def p2cards():
         wait()
         clear()
     elif p2upgrade == 3:
-        p2MaxSP += 5
+        p2MaxSP += 10
         p2sp += 15
         if p2sp > p2MaxSP:
             p2sp = p2MaxSP
