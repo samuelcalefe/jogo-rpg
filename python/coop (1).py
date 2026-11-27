@@ -45,6 +45,10 @@ abilityCharge = False
 speed = False
 invAccess = False
 inventory = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+damageDealt = 0
+damageTaken = 0
+totalUpgrades = 0
+p1Damage = 0
 
 # estatisticas do jogador 2
 p2hp = 80
@@ -61,6 +65,7 @@ p2defBonus = 0
 p2fireTurns = 0
 p2ultCharge = 0
 rabbitTurn = 0
+p2Damage = 0
 if p2ultCharge > 100:
     p2ultCharge = 100
 p2 = str(input("Nome do 2º jogador: "))
@@ -114,6 +119,7 @@ def p1Burn():
         print(f"{p1} está queimando! -10HP")
         print("-------------------------------------------------------------")
         p1hp -= 10
+        damageTaken += 10
         if p1hp < 0:
             p1hp = 0
         wait()
@@ -134,6 +140,7 @@ def p2Burn():
         print(f"{p2} está queimando! -10HP")
         print("-------------------------------------------------------------")
         p2hp -= 10
+        damageTaken += 10
         if p2hp < 0:
             p2hp = 0
         wait()
@@ -1831,5 +1838,10 @@ if p1hp <= 0 and p2hp <= 0:
     print("Os jogadores perderam... womp womp")
     print(f"Total de turnos: {turns}")
 elif enemyhp <= 0:
+    print("------Estatísticas de vitória------")
     print("Os jogadores venceram! yippie!")
-    print(f"Total de turnos: {turns}")
+    print(f"\nTotal de turnos: {turns}")
+    print(f"Dano total levado: {damageTaken}")
+    print(f"Dano total causado: {damageDealt}")
+    print(f"Upgrades totais: {}")
+    print(f"Melhor jogador: {}")
