@@ -242,30 +242,34 @@ def pray():
             print(f"{p1} está morto! Não foi curado.")
             wait()
             clear()
-            healChoice == 3
-        print(f"Curou {p1} com {heal + p2magBonus}HP!")
-        wait()
-        clear()
-        p2sp -= 10
-        if p2sp < 0:
-            p2sp = 0
-        p1hp += (heal + p2magBonus)
-        if p1hp > p1maxHP:
-            p1hp = p1maxHP
+            p2magic()
+        else:
+            print(f"Curou {p1} com {heal + p2magBonus}HP!")
+            wait()
+            clear()
+            p2sp -= 10
+            if p2sp < 0:
+                p2sp = 0
+            p1hp += (heal + p2magBonus)
+            if p1hp > p1maxHP:
+                p1hp = p1maxHP
         
     elif healChoice == 2:
-        print(f"Curou {p2} com {heal + p2magBonus}HP!")
-        wait()
-        clear()
-        p2sp -= 10
-        if p2sp < 0:
-            p2sp = 0
-        p2hp += (heal + p2magBonus)
-        if p2hp > 80:
-            p2hp = 80
-    elif healChoice == 3:
-        clear()
-        p2magic()
+        if p2hp <= 0:
+            print(f"{p2} está morto! Não foi curado.")
+            wait()
+            clear()
+            p2magic()
+        else:
+            print(f"Curou {p2} com {heal + p2magBonus}HP!")
+            wait()
+            clear()
+            p2sp -= 10
+            if p2sp < 0:
+                p2sp = 0
+            p2hp += (heal + p2magBonus)
+            if p2hp > 80:
+                p2hp = 80
 
 def block():
     global p1hp, p1sp, p2, p2hp, p2target, p1block
@@ -344,7 +348,7 @@ def p1menu():
         wait()
         clear()
         return
-    if rabbitActive:
+    if rabbitActive and p1hp > 0:
         if rabbitTurn < 3:
             print(f"O coelho curou {p1} com 10 HP!")
             p1hp += 10
@@ -917,7 +921,7 @@ def p2menu():
     if p2hp <= 0:
         return
     if rabbitActive:
-        if rabbitTurn < 3:
+        if rabbitTurn < 3 and p2hp > 0:
             print(f"O coelho curou {p2} com 10 HP!")
             p2hp += 10
             if p2hp > 80:
