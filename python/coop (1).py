@@ -55,7 +55,7 @@ p2MaxSP = 60
 if p2sp > p2MaxSP:
     p2sp = p2MaxSP
 p2atk = 0
-heal = 20
+heal = 18
 p2magBonus = 0
 p2defBonus = 0
 p2fireTurns = 0
@@ -1210,7 +1210,6 @@ def p2magic():
                 clear()
                 continue
             elif songChoice == 1:
-                media = 16
                 p2sp -= 20
                 if p2sp < 0:
                     p2sp = 0
@@ -1219,11 +1218,11 @@ def p2magic():
                 wait()
                 clear()
                 if p1hp > 0:
-                    p1hp += (16 + p2magBonus)
+                    p1hp += (15 + p2magBonus)
                     if p1hp > p1maxHP:
                         p1hp = p1maxHP
                 if p2hp > 0:
-                    p2hp += (16 + p2magBonus)
+                    p2hp += (15 + p2magBonus)
                     if p2hp > 80:
                         p2hp = 80
                 return True
@@ -1306,11 +1305,11 @@ def p2cards():
         except ValueError:
             p2upgrade = 0
     if p2upgrade == 1:
-        p2magBonus += 2
+        p2magBonus += 3
         p2sp += 5
         if p2sp > p2MaxSP:
             p2sp = p2MaxSP
-        print("Melhorou habilidades de magia por +2! Recebeu 5 SP.")
+        print("Melhorou habilidades de magia por +3! Recebeu 5 SP.")
         print("-------------------------------------------------------------")
         wait()
         clear()
