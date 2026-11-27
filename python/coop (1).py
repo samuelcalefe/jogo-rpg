@@ -1041,6 +1041,46 @@ def p2magic():
         pray()
     elif p2action == 7:
         motivate()
+    elif p2action == 8:
+        songOption = [1, 0]
+        print(f"[1] Curar todos")
+        if p1hp < 0:
+            print(f"[2] Reviver {p1}")
+            songOption.append(2)
+        print("[0] Voltar")
+        try:
+            songChoice = int(input("Qual música: "))
+        except ValueError:
+            songChoice == 0
+        while songChoice not in songOption:
+            try:
+                songChoice = int(input("Escolha uma válida:"))
+            except ValueError:
+                songChoice == 0
+        if songChoice == 0:
+            clear()
+            p2Magic()
+        elif songChoice == 1:
+            media = 16
+            p2sp -= 20
+            if p2sp < 0:
+                p2sp = 0
+            print(f"{p2} cantou uma música motivadora! Jogadores foram ambos curados por {media + p2magBonus} HP")
+            print("-------------------------------------------------------------")
+            wait()
+            clear()
+            p1hp += (16 + p2magBonus)
+            p1hp += (16 + p2magBonus)
+        elif songChoice == 2:
+            p2sp -= 20
+            if p2sp < 0:
+                p2sp = 0
+            print(f"{p2} cantou uma música rejuvenecedora! {p1} foi revivido!")
+            print("-------------------------------------------------------------")
+            wait()
+            clear()
+            p1hp += (p1maxHP / 2)
+            
     elif p2action == 9:
         parryActive = True
         print("Levantou uma barreira protetora!")
