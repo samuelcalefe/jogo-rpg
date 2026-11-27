@@ -1034,11 +1034,11 @@ def p1cards():
         if p1sp > 30:
             p1sp = 30
     elif p1upgrade == 2:
-        print("Aumentou defesa por 2. Restaurou 5 SP.")
+        print("Aumentou defesa por 3. Restaurou 5 SP.")
         print("------------------------------------")
         wait()
         clear()
-        p1defBonus += 2
+        p1defBonus += 3
         p1sp += 5
         if p1sp > 30:
             p1sp = 30
@@ -1357,11 +1357,11 @@ def p2cards():
         wait()
         clear()
     elif p2upgrade == 2:
-        p2defBonus += 4
+        p2defBonus += 3
         p2sp += 5
         if p2sp > p2MaxSP:
             p2sp = p2MaxSP
-        print("Aumentou a defesa por +4! Recebeu 5 SP.")
+        print("Aumentou a defesa por +3! Recebeu 5 SP.")
         print("-------------------------------------------------------------")
         wait()
         clear()
