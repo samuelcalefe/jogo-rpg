@@ -111,7 +111,7 @@ enemyOnFire = False
 enemyDistress = False
 
 def p1Burn():
-    global p1fireTurns, p1hp, p1onFire
+    global p1fireTurns, p1hp, p1onFire, damageTaken
     if not p1onFire:
         return
     p1fireTurns += 1
@@ -132,7 +132,7 @@ def p1Burn():
         clear()
 
 def p2Burn():
-    global p2fireTurns, p2hp, p2onFire
+    global p2fireTurns, p2hp, p2onFire, damageTaken
     if not p2onFire:
         return
     p2fireTurns += 1
@@ -220,14 +220,17 @@ def p2Casts():
             return False
 
 def burn():
-    global enemyfireTurns, enemyhp, enemyOnFire
+    global enemyfireTurns, enemyhp, enemyOnFire, damageDealt, p1Damage
     if not enemyOnFire:
         return
     enemyfireTurns += 1
     if enemyfireTurns <= 3:
         print("O inimigo está queimando! -15HP")
         print("-------------------------------------------------------------")
+        dano_burn = min(enemyhp, 15)
         enemyhp -= 15
+        damageDealt += dano_burn
+        p1Damage += dano_burn
         if enemyhp < 0:
             enemyhp = 0
         wait()
@@ -311,7 +314,7 @@ def pray():
             return False
 
 def block(dmg):
-    global p1hp, p1, p1block, p1defBonus, p1Defend
+    global p1hp, p1, p1block, p1defBonus, p1Defend, damageTaken
     if p1block:
         p1absorb = dmg // 2
         dmg -= p1absorb
@@ -319,6 +322,7 @@ def block(dmg):
         if p1Defend:
             p1absorbFinal //= 2
         p1hp -= p1absorbFinal
+        damageTaken += p1absorbFinal
         if p1hp < 0:
             p1hp = 0
         print(f"{p1} bloqueou e absorveu {p1absorbFinal} do dano!")
@@ -399,7 +403,7 @@ def isCharged():
 
 # ações                               
 def p1menu():
-    global p1hp, p1sp, p1atk, p1atkBonus, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p1MotivateATK, p1maxHP, abilityCharge, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p1MotivateDEF, p2MotivateATK, p2MotivateDEF, ult, p1Ult, p2Ult, p2ultCharge, inventory, p1Defend, p1block
+    global p1hp, p1sp, p1atk, p1atkBonus, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p1MotivateATK, p1maxHP, abilityCharge, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p1MotivateDEF, p2MotivateATK, p2MotivateDEF, ult, p1Ult, p2Ult, p2ultCharge, inventory, p1Defend, p1block, damageDealt, p1Damage
     if p1hp <= 0:
         return
     p1Defend = False
@@ -464,6 +468,9 @@ def p1menu():
                 print(f"Crítico! {p1} atacou e deu {p1dmg} de dano! Derrubou o inimigo!")
                 print("-------------------------------------------------------------")  
                 skipEnemy = True
+                dano_causado = min(enemyhp, p1dmg)
+                damageDealt += dano_causado
+                p1Damage += dano_causado
                 enemyhp -= p1dmg
                 if enemyhp < 0:
                     enemyhp = 0
@@ -476,6 +483,9 @@ def p1menu():
             else:
                 print(f"{p1} atacou e deu {p1dmg} de dano!")
                 print("-------------------------------------------------------------")
+                dano_causado = min(enemyhp, p1dmg)
+                damageDealt += dano_causado
+                p1Damage += dano_causado
                 enemyhp -= p1dmg
                 if enemyhp < 0:
                     enemyhp = 0
@@ -768,7 +778,7 @@ def p1menu():
             return
 
 def p1abilities():
-    global p1hp, p1sp, p1atk, p1atkBonus, p1slashBonus, p1maxHP, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1block, p1MotivateATK, abilityCharge, p1Ult, defDebuff, defDebuffTurns, speed, speedTurns, enemyOnFire, enemyfireTurns
+    global p1hp, p1sp, p1atk, p1atkBonus, p1slashBonus, p1maxHP, p2hp, p2sp, enemyhp, skipP1, skipP2, skipEnemy, p1block, p1MotivateATK, abilityCharge, p1Ult, defDebuff, defDebuffTurns, speed, speedTurns, enemyOnFire, enemyfireTurns, damageDealt, p1Damage
     while True:
         p1stats()
         print(f"------------------------{p1} - Habilidades--------------------------")
@@ -823,6 +833,9 @@ def p1abilities():
                 print(f"Crítico! {p1} usou Slash e deu {slash} de dano! Derrubou o inimigo!")
                 print("-------------------------------------------------------------")  
                 skipEnemy = True
+                dano_causado = min(enemyhp, slash)
+                damageDealt += dano_causado
+                p1Damage += dano_causado
                 enemyhp -= slash
                 if enemyhp < 0:
                     enemyhp = 0
@@ -837,6 +850,9 @@ def p1abilities():
                 print("-------------------------------------------------------------")
                 wait()
                 clear()
+                dano_causado = min(enemyhp, slash)
+                damageDealt += dano_causado
+                p1Damage += dano_causado
                 enemyhp -= slash
                 if enemyhp < 0:
                     enemyhp = 0
@@ -880,6 +896,9 @@ def p1abilities():
                 if defDebuffTurns >= 3:
                     defDebuff = False
                     defDebuffTurns = 0
+            dano_causado = min(enemyhp, fire)
+            damageDealt += dano_causado
+            p1Damage += dano_causado
             enemyhp -= fire
             if enemyhp < 0:
                 enemyhp = 0
@@ -918,6 +937,9 @@ def p1abilities():
                 clear()
                 continue
             print("Roubou 25 HP do inimigo!")
+            dano_causado = min(enemyhp, 25)
+            damageDealt += dano_causado
+            p1Damage += dano_causado
             enemyhp -= 25
             if enemyhp < 0:
                 enemyhp = 0
@@ -952,6 +974,9 @@ def p1abilities():
                 p1Ult = 0
                 print("Usou o ataque supremo! Carga voltou para 0.")
                 skipEnemy = True
+                dano_causado = min(enemyhp, 75)
+                damageDealt += dano_causado
+                p1Damage += dano_causado
                 enemyhp -= 75
                 if enemyhp < 0:
                     enemyhp = 0
@@ -970,7 +995,7 @@ def p1abilities():
             return False
 
 def p1cards():
-    global p1atkBonus, p1defBonus, p1slashBonus, lifeSteal, ult, p1, p1sp, p1hp, p1maxHP, charge, turns, invAccess
+    global p1atkBonus, p1defBonus, p1slashBonus, lifeSteal, ult, p1, p1sp, p1hp, p1maxHP, charge, turns, invAccess, totalUpgrades
     print(f"------------------{p1} - UPGRADE-----------------")
     print("[1] ATK++  |  Aumenta seu ataque.")
     print("[2] DEF++  |  Aumenta sua defesa.")
@@ -998,6 +1023,7 @@ def p1cards():
             p1upgrade = int(input("Escolha um upgrade válido: "))
         except ValueError:
             p1upgrade = 0
+    totalUpgrades += 1
     if p1upgrade == 1:
         print("Aumentou ataque por 3. Restaurou 5 SP.")
         print("------------------------------------")
@@ -1048,7 +1074,7 @@ def p1cards():
         invAccess = True
 
 def p2menu():
-    global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p2Defend, enemyDistress, distressTurns, parryActive
+    global p1hp, p1sp, p1atk, p2hp, p2sp, p2MaxSP, enemyhp, skipP1, skipP2, skipEnemy, p2MotivateATK, p2Summon, rabbitTurn, rabbitActive, defDebuff, defDebuffTurns, p2Defend, enemyDistress, distressTurns, parryActive, damageDealt, p2Damage
     if p2hp <= 0:
         return
     p2Defend = False
@@ -1098,6 +1124,9 @@ def p2menu():
                 if defDebuffTurns >= 3:
                     defDebuff = False
                     defDebuffTurns = 0
+            dano_causado = min(enemyhp, p2dmg)
+            damageDealt += dano_causado
+            p2Damage += dano_causado
             enemyhp -= p2dmg
             if enemyhp < 0:
                 enemyhp = 0
@@ -1131,7 +1160,7 @@ def p2menu():
                 return
 
 def p2magic():
-    global p1hp, p1sp, p1atk, p1maxHP, p2hp, p2sp, p2MaxSP, enemyhp, heal, skipP1, skipP2, p1, p2, p2MotivateATK, p2Parry, p2Ult, parryActive, p2ultCharge, defDebuff, defDebuffTurns, atkDebuff, atkDebuffTurns, skipEnemy
+    global p1hp, p1sp, p1atk, p1maxHP, p2hp, p2sp, p2MaxSP, enemyhp, heal, skipP1, skipP2, p1, p2, p2MotivateATK, p2Parry, p2Ult, parryActive, p2ultCharge, defDebuff, defDebuffTurns, atkDebuff, atkDebuffTurns, skipEnemy, damageDealt, p2Damage
     while True:
         p2stats()
         print(f"------------------------{p2} - Magia--------------------------")
@@ -1172,6 +1201,9 @@ def p2magic():
                 if defDebuffTurns >= 3:
                     defDebuff = False
                     defDebuffTurns = 0
+            dano_causado = min(enemyhp, ice)
+            damageDealt += dano_causado
+            p2Damage += dano_causado
             enemyhp -= ice
             if enemyhp < 0:
                 enemyhp = 0
@@ -1220,7 +1252,7 @@ def p2magic():
                 p2sp -= 20
                 if p2sp < 0:
                     p2sp = 0
-                print(f"{p2} cantou uma música motivadora! Jogadores foram ambos curados por {media + p2magBonus} HP")
+                print(f"{p2} cantou uma música motivadora! Jogadores foram ambos curados por {15 + p2magBonus} HP")
                 print("-------------------------------------------------------------")
                 wait()
                 clear()
@@ -1276,6 +1308,9 @@ def p2magic():
                 defDebuff = True
                 defDebuffTurns = 0
                 p2sp = p2MaxSP
+                dano_causado = min(enemyhp, 50)
+                damageDealt += dano_causado
+                p2Damage += dano_causado
                 enemyhp -= 50
                 if enemyhp < 0:
                     enemyhp = 0
@@ -1287,7 +1322,7 @@ def p2magic():
             return False
 
 def p2cards():
-    global p2magBonus, p2defBonus, p2sp, p2, p2MaxSP, p2Summon, p2Parry, p2Ult, turns
+    global p2magBonus, p2defBonus, p2sp, p2, p2MaxSP, p2Summon, p2Parry, p2Ult, turns, totalUpgrades
     print(f"------------------{p2} - UPGRADE-----------------")
     print("[1] MAG++  |  Melhora sua magia.")
     print("[2] DEF++  |  Aumenta sua defesa.")
@@ -1311,6 +1346,7 @@ def p2cards():
             p2upgrade = int(input("Escolha um válido: "))
         except ValueError:
             p2upgrade = 0
+    totalUpgrades += 1
     if p2upgrade == 1:
         p2magBonus += 3
         p2sp += 5
@@ -1358,7 +1394,7 @@ def p2cards():
         clear()
 
 def aplicar_dano_p1(dano):
-    global p1hp, p1defBonus, p1MotivateDEF, p1Defend
+    global p1hp, p1defBonus, p1MotivateDEF, p1Defend, damageTaken
     dano = max(0, dano - p1defBonus)
     if p1MotivateDEF:
         dano //= 2
@@ -1366,12 +1402,13 @@ def aplicar_dano_p1(dano):
     if p1Defend:
         dano //= 2
     p1hp -= dano
+    damageTaken += dano
     if p1hp < 0:
         p1hp = 0
     return dano
 
 def aplicar_dano_p2(dano):
-    global p2hp, p2defBonus, p2MotivateDEF, p2Defend
+    global p2hp, p2defBonus, p2MotivateDEF, p2Defend, damageTaken
     dano = block(dano)
     dano = max(0, dano - p2defBonus)
     if p2MotivateDEF:
@@ -1380,13 +1417,14 @@ def aplicar_dano_p2(dano):
     if p2Defend:
         dano //= 2
     p2hp -= dano
+    damageTaken += dano
     if p2hp < 0:
         p2hp = 0
     return dano
 
 def enemyActions():
     global p1hp, p1sp, p2hp, p2sp, enemyhp, enemyMaxHP, p1target, p2target, skipEnemy, skipP1, skipP2, playerChoice, p1block, wolfActive, wolfTurns, parryActive, atkDebuff, atkDebuffTurns
-    global p1MotivateDEF, p2MotivateDEF, ragedEnemy, speed, speedTurns, enemyDistress, p1onFire, p1fireTurns, p2onFire, p2fireTurns
+    global p1MotivateDEF, p2MotivateDEF, ragedEnemy, speed, speedTurns, enemyDistress, p1onFire, p1fireTurns, p2onFire, p2fireTurns, damageDealt, p2Damage
     if p1hp <= 0 and p2hp <= 0:
         return
     if skipEnemy:
@@ -1412,29 +1450,120 @@ def enemyActions():
         return
 
     extra_turns = 1
+    combo_usado = False
     while extra_turns > 0:
         extra_turns -= 1
         if (p1hp <= 0 and p2hp <= 0) or enemyhp <= 0:
             break
 
         if p1hp > 0 and p2hp > 0:
-            playerTarget = random.randint(1, 2)
+            peso_p1 = 50
+            if p1hp < p2hp:
+                peso_p1 += 25
+                if p1hp <= 30:
+                    peso_p1 += 10
+            elif p2hp < p1hp:
+                peso_p1 -= 25
+                if p2hp <= 30:
+                    peso_p1 -= 10
+            if parryActive:
+                peso_p1 = min(90, peso_p1 + 30)
+            if skipP1 and p1hp <= 45:
+                peso_p1 = min(95, peso_p1 + 15)
+            elif skipP2 and p2hp <= 45:
+                peso_p1 = max(5, peso_p1 - 15)
+            playerTarget = 1 if random.randint(1, 100) <= peso_p1 else 2
         elif p1hp > 0:
             playerTarget = 1
         else:
             playerTarget = 2
 
-        if ragedEnemy:
-            enemyChoice = random.randint(1, 2)
-            enemySpell = random.randint(1, 4) if enemyChoice == 2 else 0
+        hp_ratio = enemyhp / enemyMaxHP
+        target_hp = p1hp if playerTarget == 1 else p2hp
+        target_burning = p1onFire if playerTarget == 1 else p2onFire
+        target_stunned = skipP1 if playerTarget == 1 else skipP2
+
+       
+        decidiu_curar = False
+        if enemyhp < enemyMaxHP - 15:
+            if hp_ratio <= 0.25:
+                chance_cura = 65
+            elif hp_ratio <= 0.45:
+                chance_cura = 45
+            elif hp_ratio <= 0.65:
+                chance_cura = 20
+            else:
+                chance_cura = 0
+            if playerChoice == 4:
+                chance_cura //= 2
+            if target_hp <= 22 and chance_cura > 0:
+                chance_cura = max(5, chance_cura - 25)
+            if enemyDistress and hp_ratio < 0.75:
+                chance_cura += 15
+            if chance_cura > 0 and random.randint(1, 100) <= chance_cura:
+                decidiu_curar = True
+
+        if decidiu_curar:
+            enemyChoice = 2
+            enemySpell = 3
         else:
-            enemyChoice = random.randint(1, 2)
-            enemySpell = random.randint(1, 3) if enemyChoice == 2 else 0
+            w_atk = 35
+            w_fire = 30
+            w_ice = 30
+            w_aoe = 35 if (ragedEnemy and p1hp > 0 and p2hp > 0) else (15 if ragedEnemy else 0)
+
+
+            if target_stunned:
+                w_ice = 5
+                w_atk += 30
+                w_fire += 20
+
+
+            if not target_burning:
+                w_fire += 20
+            else:
+                w_fire = 10
+                w_atk += 15
+                if not target_stunned:
+                    w_ice += 15
+
+            if enemyDistress:
+                w_fire += 20
+                w_ice += 20
+                w_atk = 15
+                w_aoe = max(0, w_aoe - 20)
+
+            if target_hp <= 25:
+                w_atk += 25
+                w_fire += 15
+                w_ice = 10
+
+            if ragedEnemy and p1hp > 0 and p2hp > 0 and not parryActive:
+                w_aoe += 15
+
+            total_w = w_atk + w_fire + w_ice + w_aoe
+            roll = random.randint(1, total_w)
+            if roll <= w_atk:
+                enemyChoice = 1
+                enemySpell = 0
+            elif roll <= w_atk + w_fire:
+                enemyChoice = 2
+                enemySpell = 1
+            elif roll <= w_atk + w_fire + w_ice:
+                enemyChoice = 2
+                enemySpell = 2
+            else:
+                enemyChoice = 2
+                enemySpell = 4
 
         if enemyChoice == 1:
+            playerChoice = 1
             if playerTarget == 1:
                 if ragedEnemy == True:
                     enemyatk = random.randint(10, 35) + p1target
+                    if skipP1:
+                        enemyatk = int(enemyatk * 1.25)
+                        print(f"O inimigo aproveitou a guarda aberta de {p1}!")
                     if enemyDistress:
                         enemyatk //= 2
                     enemyCrit = random.randint(1, 4)
@@ -1452,7 +1581,9 @@ def enemyActions():
                             print("-------------------------------------------------------------")
                             wait()
                             clear()
-                            extra_turns += 1
+                            if not combo_usado:
+                                combo_usado = True
+                                extra_turns += 1
                         else:
                             dano_final = aplicar_dano_p1(enemyatk)
                             print(f"O inimigo atacou {p1} e deu {dano_final} de dano!")
@@ -1461,6 +1592,9 @@ def enemyActions():
                             clear()
                 else:
                     enemyatk = random.randint(7, 28) + p1target
+                    if skipP1:
+                        enemyatk = int(enemyatk * 1.25)
+                        print(f"O inimigo aproveitou a guarda aberta de {p1}!")
                     if enemyDistress:
                         enemyatk //= 2
                     if speed and random.randint(1, 4) == 1:
@@ -1482,6 +1616,9 @@ def enemyActions():
             elif playerTarget == 2:
                 if ragedEnemy == True:
                     enemyatk = random.randint(10, 35) + p2target
+                    if skipP2:
+                        enemyatk = int(enemyatk * 1.25)
+                        print(f"O inimigo aproveitou a guarda aberta de {p2}!")
                     if enemyDistress:
                         enemyatk //= 2
                     enemyCrit = random.randint(1, 4)
@@ -1493,6 +1630,9 @@ def enemyActions():
                     elif parryActive:
                         if enemyCrit == 4:
                             enemyatk = int(enemyatk * 1.5)
+                        dano_refletido = min(enemyhp, enemyatk)
+                        damageDealt += dano_refletido
+                        p2Damage += dano_refletido
                         enemyhp -= enemyatk
                         if enemyhp < 0:
                             enemyhp = 0
@@ -1511,7 +1651,9 @@ def enemyActions():
                             print("-------------------------------------------------------------")
                             wait()
                             clear()
-                            extra_turns += 1
+                            if not combo_usado:
+                                combo_usado = True
+                                extra_turns += 1
                         else:
                             dano_final = aplicar_dano_p2(enemyatk)
                             print(f"O inimigo atacou {p2} e deu {dano_final} de dano!")
@@ -1520,6 +1662,9 @@ def enemyActions():
                             clear()
                 else:
                     enemyatk = random.randint(7, 28) + p2target
+                    if skipP2:
+                        enemyatk = int(enemyatk * 1.25)
+                        print(f"O inimigo aproveitou a guarda aberta de {p2}!")
                     if enemyDistress:
                         enemyatk //= 2
                     if speed and random.randint(1, 4) == 1:
@@ -1535,6 +1680,9 @@ def enemyActions():
                                 atkDebuff = False
                                 atkDebuffTurns = 0
                         if parryActive:
+                            dano_refletido = min(enemyhp, enemyatk)
+                            damageDealt += dano_refletido
+                            p2Damage += dano_refletido
                             enemyhp -= enemyatk
                             if enemyhp < 0:
                                 enemyhp = 0
@@ -1551,11 +1699,15 @@ def enemyActions():
                             clear()
         elif enemyChoice == 2:
             if enemySpell == 1:
+                playerChoice = 2
                 if playerTarget == 1:
                     if ragedEnemy:
                         enemyFire = random.randint(12, 40) + p1target
                     else:
                         enemyFire = random.randint(10, 36) + p1target
+                    if skipP1:
+                        enemyFire = int(enemyFire * 1.25)
+                        print(f"O inimigo incinerou {p1} enquanto estava imobilizado!")
                     if enemyDistress:
                         enemyFire //= 2
                     if speed and random.randint(1, 4) == 1:
@@ -1572,8 +1724,8 @@ def enemyActions():
                                 atkDebuffTurns = 0
                         dano_final = aplicar_dano_p1(enemyFire)
                         print(f"O inimigo usou fogo contra {p1}! Tomou {dano_final} de dano.")
-                        enemyBurn = random.randint(1, 4)
-                        if enemyBurn == 4 and p1hp > 0:
+                        enemyBurn = random.randint(1, 3 if skipP1 else 4)
+                        if enemyBurn == 1 and p1hp > 0:
                             p1onFire = True
                             p1fireTurns = 0
                             print(f"{p1} pegou fogo!")
@@ -1584,6 +1736,9 @@ def enemyActions():
                         enemyFire = random.randint(12, 40) + p2target
                     else:
                         enemyFire = random.randint(10, 36) + p2target
+                    if skipP2:
+                        enemyFire = int(enemyFire * 1.25)
+                        print(f"O inimigo incinerou {p2} enquanto estava imobilizado!")
                     if enemyDistress:
                         enemyFire //= 2
                     if speed and random.randint(1, 4) == 1:
@@ -1599,6 +1754,9 @@ def enemyActions():
                                 atkDebuff = False
                                 atkDebuffTurns = 0
                         if parryActive:
+                            dano_refletido = min(enemyhp, enemyFire)
+                            damageDealt += dano_refletido
+                            p2Damage += dano_refletido
                             enemyhp -= enemyFire
                             if enemyhp < 0:
                                 enemyhp = 0
@@ -1611,14 +1769,15 @@ def enemyActions():
                         else:
                             dano_final = aplicar_dano_p2(enemyFire)
                             print(f"O inimigo usou fogo contra {p2}! Tomou {dano_final} de dano.")
-                            enemyBurn = random.randint(1, 4)
-                            if enemyBurn == 4 and p2hp > 0:
+                            enemyBurn = random.randint(1, 3 if skipP2 else 4)
+                            if enemyBurn == 1 and p2hp > 0:
                                 p2onFire = True
                                 p2fireTurns = 0
                                 print(f"{p2} pegou fogo!")
                             wait()
                             clear()
             elif enemySpell == 2:
+                playerChoice = 3
                 if playerTarget == 1:
                     if ragedEnemy:
                         enemyIce = random.randint(10, 35) + p1target
@@ -1648,6 +1807,10 @@ def enemyActions():
                             skipP1 = True
                             time.sleep(2)
                             print(f"Congelou! {p1} não pode se mexer!")
+                            if ragedEnemy and not combo_usado:
+                                print("O inimigo prepara um golpe em seguida!")
+                                combo_usado = True
+                                extra_turns += 1
                         wait()
                         clear()
                 elif playerTarget == 2:
@@ -1670,6 +1833,9 @@ def enemyActions():
                                 atkDebuff = False
                                 atkDebuffTurns = 0
                         if parryActive:
+                            dano_refletido = min(enemyhp, enemyIce)
+                            damageDealt += dano_refletido
+                            p2Damage += dano_refletido
                             enemyhp -= enemyIce
                             if enemyhp < 0:
                                 enemyhp = 0
@@ -1690,9 +1856,14 @@ def enemyActions():
                                 skipP2 = True
                                 time.sleep(2)
                                 print(f"Congelou! {p2} não pode se mexer!")
+                                if ragedEnemy and not combo_usado:
+                                    print("O inimigo prepara um golpe em seguida!")
+                                    combo_usado = True
+                                    extra_turns += 1
                             wait()
                             clear()
             elif enemySpell == 3:
+                playerChoice = 4
                 if ragedEnemy == True:
                     enemyhp += 50
                     if enemyhp > enemyMaxHP:
@@ -1708,17 +1879,24 @@ def enemyActions():
                     wait()
                     clear()
             elif enemySpell == 4:
+                playerChoice = 5
                 dano_area = 35 // 2 if enemyDistress else 35
                 if p1hp > 0:
                     if speed and random.randint(1, 4) == 1:
                         print(f"O inimigo atacou loucamente! Mas {p1} desviou!")
                     else:
-                        dano_final_p1 = aplicar_dano_p1(dano_area)
+                        dano_p1_area = int(dano_area * 1.25) if skipP1 else dano_area
+                        if skipP1:
+                            print(f"{p1} estava vulnerável ao ataque em área!")
+                        dano_final_p1 = aplicar_dano_p1(dano_p1_area)
                         print(f"O inimigo atacou loucamente! {p1} foi atingido por {dano_final_p1} HP.")
                 if p2hp > 0:
                     if speed and random.randint(1, 4) == 1:
                         print(f"O inimigo atacou loucamente! Mas {p2} desviou!")
                     elif parryActive:
+                        dano_refletido = min(enemyhp, dano_area)
+                        damageDealt += dano_refletido
+                        p2Damage += dano_refletido
                         enemyhp -= dano_area
                         if enemyhp < 0:
                             enemyhp = 0
@@ -1726,7 +1904,10 @@ def enemyActions():
                         parryActive = False
                         print(f"{p2} deu um parry no ataque louco do inimigo! -{dano_area} HP e derrubou o inimigo!")
                     else:
-                        dano_final_p2 = aplicar_dano_p2(dano_area)
+                        dano_p2_area = int(dano_area * 1.25) if skipP2 else dano_area
+                        if skipP2:
+                            print(f"{p2} estava vulnerável ao ataque em área!")
+                        dano_final_p2 = aplicar_dano_p2(dano_p2_area)
                         print(f"O inimigo atacou loucamente! {p2} foi atingido por {dano_final_p2} HP.")
                 wait()
                 clear()
@@ -1765,7 +1946,10 @@ while (p1hp > 0 or p2hp > 0) and enemyhp > 0:
         distress()
     if wolfActive:
         if wolfTurns < 3:
+            dano_lobo = min(enemyhp, 15)
             enemyhp -= 15
+            damageDealt += dano_lobo
+            p2Damage += dano_lobo
             if enemyhp < 0:
                 enemyhp = 0
             print("O lobo atacou e deu 15 HP de dano!")
@@ -1834,14 +2018,30 @@ while (p1hp > 0 or p2hp > 0) and enemyhp > 0:
         if p2ultCharge > 100:
             p2ultCharge = 100
 
+if p1Damage > p2Damage:
+    melhor_jogador = f"{p1} ({p1Damage} de dano)"
+elif p2Damage > p1Damage:
+    melhor_jogador = f"{p2} ({p2Damage} de dano)"
+else:
+    melhor_jogador = f"Empate ({p1Damage} de dano cada)"
+
 if p1hp <= 0 and p2hp <= 0:
+    print("------Estatísticas de derrota------")
     print("Os jogadores perderam... womp womp")
-    print(f"Total de turnos: {turns}")
+    print(f"\nTotal de turnos: {turns}")
+    print(f"Dano total levado: {damageTaken}")
+    print(f"Dano total causado: {damageDealt}")
+    print(f"Dano de {p1}: {p1Damage}")
+    print(f"Dano de {p2}: {p2Damage}")
+    print(f"Upgrades totais: {totalUpgrades}")
+    print(f"Melhor jogador: {melhor_jogador}")
 elif enemyhp <= 0:
     print("------Estatísticas de vitória------")
     print("Os jogadores venceram! yippie!")
     print(f"\nTotal de turnos: {turns}")
     print(f"Dano total levado: {damageTaken}")
     print(f"Dano total causado: {damageDealt}")
-    print(f"Upgrades totais: {}")
-    print(f"Melhor jogador: {}")
+    print(f"Dano de {p1}: {p1Damage}")
+    print(f"Dano de {p2}: {p2Damage}")
+    print(f"Upgrades totais: {totalUpgrades}")
+    print(f"Melhor jogador: {melhor_jogador}")
